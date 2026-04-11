@@ -214,13 +214,24 @@ class Doc:
     num_samples: int = 1  # number of samples to generate for each sample
     generation_grammar: None = None
 
-    def get_golds(self):
-        """Return gold targets extracted from the target dict"""
-        gold_indices = as_list(self.gold_index)
-        golds = []
-        for gold_ix in gold_indices:
-            golds.extend(as_list(self.choices[gold_ix]))
+   def get_golds(self):
+    """Return gold targets extracted from the target dict"""
+
+    gold_indices = as_list(self.gold_index)
+    golds = []
+
+    if not self.choices:   # the fix
         return golds
+
+    for gold_ix in gold_indices:
+        if gold_ix >= len(self.choices):
+            raise ValueError(
+                f"gold_index {gold_ix} is out of range. "
+                f"choices has only {len(self.choices)} items."
+            )
+        golds.extend(as_list(self.choices[gold_ix]))
+
+    return golds
 
     def __repr__(self):
         doc_dict = asdict(self)
